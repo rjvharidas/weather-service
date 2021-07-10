@@ -41,6 +41,7 @@ public class WeatherServiceImpl implements WeatherService {
     }
 
     @Override
+    @Cacheable(value = "weatherUpdate", key = "#lat+#lon")
     public WeatherUpdate getUpdateByLatLon(String lat, String lon) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(openWeatherMap.getBaseUrl())
                 .queryParam("lat", lat)
