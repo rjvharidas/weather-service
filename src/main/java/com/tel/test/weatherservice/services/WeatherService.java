@@ -5,4 +5,6 @@ import com.tel.test.weatherservice.model.WeatherUpdate;
 public interface WeatherService {
 
     WeatherUpdate getUpdate(String country, String city);
+
+    WeatherUpdate getUpdateByLatLon(String lat, String lon);
 }

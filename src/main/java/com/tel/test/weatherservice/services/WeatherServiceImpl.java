@@ -27,21 +27,31 @@ public class WeatherServiceImpl implements WeatherService {
     }
 
     private static WeatherUpdateException apply() {
-        return new WeatherUpdateException("Data not found for the requested city");
+        return new WeatherUpdateException("Weather data not found");
     }
 
     @Override
     @Cacheable(value = "weatherUpdate", key = "#city+#country")
     public WeatherUpdate getUpdate(String country, String city) {
-        return getWeatherUpdate(country, city).orElseThrow(WeatherServiceImpl::apply);
-    }
-
-    private Optional<WeatherUpdate> getWeatherUpdate(String country, String city) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(openWeatherMap.getBaseUrl())
                 .queryParam("q", addDelimeter(country, city))
                 .queryParam("appId", openWeatherMap.getAppId());
-        log.info("Weather update call for :"+ city);
-        var weatherUpdate = restTemplate.getForObject(builder.build().toString(), WeatherUpdate.class);
+        log.info("Weather update call for :" + city);
+        return getWeatherUpdate(builder.build().toString()).orElseThrow(WeatherServiceImpl::apply);
+    }
+
+    @Override
+    public WeatherUpdate getUpdateByLatLon(String lat, String lon) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(openWeatherMap.getBaseUrl())
+                .queryParam("lat", lat)
+                .queryParam("lon", lon)
+                .queryParam("appId", openWeatherMap.getAppId());
+        log.info("Weather update call for lat:" + lat + " lon: " + lon);
+        return getWeatherUpdate(builder.build().toString()).orElseThrow(WeatherServiceImpl::apply);
+    }
+
+    private Optional<WeatherUpdate> getWeatherUpdate(String url) {
+        var weatherUpdate = restTemplate.getForObject(url, WeatherUpdate.class);
         return Optional.ofNullable(weatherUpdate);
     }
 
